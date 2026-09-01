@@ -107,7 +107,7 @@ function showToast(t){let e=document.getElementById("toast");e.textContent=t;e.s
 function dayDiff(a,b){return Math.floor((new Date(b)-new Date(a))/86400000)}
 function activeDaily(){return state.contracts.filter(c=>c.active&&c.freq==="daily")}
 function checkKey(d,id){return d+"_"+id}
-function isDone(d,c){return !!state.checks[checkKey(d,c.id)]}
+function isDone(d,c){const id=typeof c==="object"?c.id:c;return !!state.checks[checkKey(d,id)]}
 function setDone(c,val=true){const k=checkKey(today(),c.id);if(val===false)delete state.checks[k];else state.checks[k]=true;save();render()}
 function dailyPct(d){let cs=activeDaily();if(!cs.length)return 100;let done=cs.filter(c=>isDone(d,c.id)).length;return Math.round(done/cs.length*100)}
 function qualifies(d){return dailyPct(d)>=80}
