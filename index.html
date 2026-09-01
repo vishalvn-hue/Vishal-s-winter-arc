@@ -100,7 +100,8 @@ button,input,select{font:inherit}button{cursor:pointer;border:0}.app{max-width:1
 const KEY="winterArcV1";
 const seed=[
 ["🚶 Walk","daily","target",1],["🏋️ Workout","daily","binary",1],["🍽️ Less than 2000 cal intake","daily","target",2000],["✍️ Create a comic","daily","binary",1],["🧠 Learn something new","daily","binary",1],["🌿 Open-air breathing","daily","binary",1],["👨‍👩‍👧 Drive / fun time with family","weekly","binary",1],["🚗 Long drive","monthly","binary",1],["🍎 Eat a fruit","daily","binary",1],["🥦 Eat a vegetable","daily","binary",1],["🍽️ Restaurant meal","monthly","binary",1],["🎵 Retro song","daily","binary",1],["♟️ Game of chess","daily","binary",1],["🧩 Brain teaser","daily","binary",1],["💧 Adequate water","daily","target",1]];
-let state=JSON.parse(localStorage.getItem(KEY)||"null")||{start:today(),contracts:seed.map((x,i)=>({id:i+1,name:x[0],freq:x[1],type:x[2],target:x[3],active:true,created:today()})),checks:{},days:{},offDays:0,sick:{month:monthKey(),used:0},history:[],vault:[]};
+let state=JSON.parse(localStorage.getItem(KEY)||"null")||{start:today(),contracts:seed.map((x,i)=>({id:i+1,name:x[0],freq:x[1],type:x[2],target:x[3],active:true,created:today()})),checks:{},days:{},dayStats:{},offDays:0,sick:{month:monthKey(),used:0},history:[],vault:[]};
+if(!state.dayStats)state.dayStats={};
 function today(){return new Date().toISOString().slice(0,10)} function monthKey(d=today()){return d.slice(0,7)}
 function save(){localStorage.setItem(KEY,JSON.stringify(state))}
 function showToast(t){let e=document.getElementById("toast");e.textContent=t;e.style.display="block";setTimeout(()=>e.style.display="none",2200)}
@@ -108,19 +109,20 @@ function dayDiff(a,b){return Math.floor((new Date(b)-new Date(a))/86400000)}
 function activeDaily(){return state.contracts.filter(c=>c.active&&c.freq==="daily")}
 function checkKey(d,id){return d+"_"+id}
 function isDone(d,c){const id=typeof c==="object"?c.id:c;return !!state.checks[checkKey(d,id)]}
-function setDone(c,val=true){const k=checkKey(today(),c.id);if(val===false)delete state.checks[k];else state.checks[k]=true;save();render()}
-function dailyPct(d){let cs=activeDaily();if(!cs.length)return 100;let done=cs.filter(c=>isDone(d,c.id)).length;return Math.round(done/cs.length*100)}
+function setDone(c,val=true){const k=checkKey(today(),c.id);if(val===false)delete state.checks[k];else state.checks[k]=true;snapshotDay(today());save();render()}
+function dailyPct(d){if(state.dayStats[d]&&state.dayStats[d].total>0)return state.dayStats[d].pct;let cs=activeDaily();if(!cs.length)return 100;let done=cs.filter(c=>isDone(d,c.id)).length;return Math.round(done/cs.length*100)}
+function snapshotDay(d=today()){let cs=activeDaily(),done=cs.filter(c=>isDone(d,c.id)).length;state.dayStats[d]={done,total:cs.length,pct:cs.length?Math.round(done/cs.length*100):100};}
 function qualifies(d){return dailyPct(d)>=80}
 function streak(){let s=0,d=new Date();while(true){let k=d.toISOString().slice(0,10),rec=state.days[k];if(rec==="off"||rec==="sick"){s++;d.setDate(d.getDate()-1);continue}if(qualifies(k)){s++;d.setDate(d.getDate()-1);continue}break}return s}
 function bestStreak(){let start=new Date(state.start+"T12:00"),end=new Date();let best=0,cur=0;for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1)){let k=d.toISOString().slice(0,10),rec=state.days[k];if(rec==="off"||rec==="sick"||qualifies(k)){cur++;best=Math.max(best,cur)}else{cur=0}}return best}
 function refreshSick(){if(state.sick.month!==monthKey()){state.sick={month:monthKey(),used:0};save()}}
 function evaluateDay(d=today()){let cs=activeDaily();if(state.days[d])return state.days[d];if(cs.length&&dailyPct(d)>=80)return state.days[d]="done";return null}
 function completeToday(){return dailyPct(today())>=80}
-function protect(kind){if(kind==="off"){if(state.offDays<1)return showToast("No earned Off Day available.");state.offDays--;state.days[today()]="off";state.history.unshift({date:today(),kind:"Earned Off Day"});save();render();showToast("🎟️ Off Day used. Streak protected.");}
-else{refreshSick();if(state.sick.used>=2)return showToast("No Sick Offs left this month.");state.sick.used++;state.days[today()]="sick";state.history.unshift({date:today(),kind:"Sick Off"});save();render();showToast("🤒 Sick Off used. Streak protected.");}}
+function protect(kind){if(kind==="off"){if(state.offDays<1)return showToast("No earned Off Day available.");state.offDays--;state.days[today()]="off";snapshotDay(today());state.history.unshift({date:today(),kind:"Earned Off Day"});save();render();showToast("🎟️ Off Day used. Streak protected.");}
+else{refreshSick();if(state.sick.used>=2)return showToast("No Sick Offs left this month.");state.sick.used++;state.days[today()]="sick";snapshotDay(today());state.history.unshift({date:today(),kind:"Sick Off"});save();render();showToast("🤒 Sick Off used. Streak protected.");}}
 function processDay(){let d=today();if(state.days[d])return;if(completeToday()){state.days[d]="done";let s=streak();if(s>0&&s%5===0&&state.offDays<3){state.offDays++;showToast("🎟️ You earned an Off Day!")}save();render()}}
 function render(){
-refreshSick();let cs=activeDaily(),done=cs.filter(c=>isDone(today(),c.id)).length,pct=cs.length?Math.round(done/cs.length*100):100,s=streak(),best=bestStreak();
+refreshSick();snapshotDay(today());save();let cs=activeDaily(),done=cs.filter(c=>isDone(today(),c.id)).length,pct=cs.length?Math.round(done/cs.length*100):100,s=streak(),best=bestStreak();
 document.getElementById("datePill").textContent=new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
 const startDate = new Date(state.start+"T12:00");
 const endYear = startDate.getMonth() >= 8 ? startDate.getFullYear()+1 : startDate.getFullYear();
