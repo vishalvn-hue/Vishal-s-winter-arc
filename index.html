@@ -106,14 +106,20 @@ function processDay(){let d=today();if(state.days[d])return; if(completeToday())
 function render(){
 refreshSick();let cs=activeDaily(),done=cs.filter(c=>isDone(today(),c.id)).length,pct=cs.length?Math.round(done/cs.length*100):100,s=streak(),best=bestStreak();
 document.getElementById("datePill").textContent=new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
-document.getElementById("dayTitle").textContent="Day "+(dayDiff(state.start,today())+1);
-document.getElementById("arcDates").textContent=new Date(state.start+"T12:00").toLocaleDateString()+" → February end";
+const startDate = new Date(state.start+"T12:00");
+const endYear = startDate.getMonth() >= 8 ? startDate.getFullYear()+1 : startDate.getFullYear();
+const endDate = new Date(endYear, 2, 0, 12, 0);
+const totalArcDays = Math.round((endDate-startDate)/86400000)+1;
+const currentDay = Math.min(totalArcDays, Math.max(1, dayDiff(state.start,today())+1));
+const fmt = d => d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
+document.getElementById("dayTitle").textContent="Day "+currentDay+" of "+totalArcDays;
+document.getElementById("arcDates").textContent=fmt(startDate)+" → "+fmt(endDate);
 document.getElementById("dailyScore").textContent=pct+"%";document.getElementById("dailyCount").textContent=done+" / "+cs.length;document.getElementById("scoreBar").style.width=pct+"%";
 document.getElementById("streak").textContent=s;document.getElementById("best").textContent=best;document.getElementById("best2").textContent=best;
 let rem=Math.max(0,cs.length-done);document.getElementById("remaining").textContent=rem;document.getElementById("contractCount").textContent=state.contracts.filter(c=>c.active).length;document.getElementById("monthName").textContent=new Date().toLocaleDateString(undefined,{month:"short"});
 document.getElementById("offs").textContent=state.offDays+" / 3";document.getElementById("offBar").style.width=(state.offDays/3*100)+"%";document.getElementById("sick").textContent=(2-state.sick.used)+" / 2";
 document.getElementById("useOff").disabled=state.offDays<1;document.getElementById("useSick").disabled=state.sick.used>=2;
-document.getElementById("dailyList").innerHTML=cs.map(c=>`<div class="contract"><button class="check ${isDone(today(),c)?"done":""}" onclick="toggle(${c.id})">${isDone(today(),c)?"✓":""}</button><div class="contract-main"><strong>${c.name}</strong><small>${c.type==="target"?"Target: "+c.target:"Complete once"} · Daily</small></div></div>`).join("")||'<div class="empty">No daily contracts.</div>';
+document.getElementById("dailyList").innerHTML=cs.map(c=>`<div class="contract"><button class="check ${isDone(today(),c)?"done":""}" onclick="toggle(${c.id})">${isDone(today(),c)?"✓":""}</button><div class="contract-main"><strong>${c.name}</strong><small>${c.name.includes("2000")?"Limit: under 2000 cal":(c.name.includes("2000")?"Limit: under 2000 cal":(c.type==="target"?"Target: "+c.target:"Complete once"))} · Daily</small></div></div>`).join("")||'<div class="empty">No daily contracts.</div>';
 document.getElementById("allContracts").innerHTML=state.contracts.map(c=>`<div class="contract"><div class="contract-main"><strong>${c.name}</strong><small>${c.freq} · ${c.type}${c.type==="target"?" · "+c.target:""}</small></div><span class="tag">${c.active?"Active":"Retired"}</span><button class="btn" onclick="retire(${c.id})">${c.active?"Retire":"Restore"}</button></div>`).join("");
 document.getElementById("history").innerHTML=state.history.slice(0,8).map(h=>`<div style="padding:6px 0">• ${h.date} · ${h.kind}</div>`).join("")||"No protected days yet.";
 let start=new Date(state.start+"T12:00"), cal="";for(let i=0;i<Math.max(28,dayDiff(state.start,today())+8);i++){let d=new Date(start);d.setDate(start.getDate()+i);let k=d.toISOString().slice(0,10);let cls=d>new Date()?"future":state.days[k]==="done"?"done":state.days[k]==="off"||state.days[k]==="sick"?"protected":state.days[k]==="missed"?"missed":"";cal+=`<div class="day ${cls}" title="${k}"></div>`}document.getElementById("calendar").innerHTML=cal;
