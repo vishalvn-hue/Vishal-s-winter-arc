@@ -53,6 +53,7 @@ button,input,select{font:inherit}button{cursor:pointer;border:0}.app{max-width:1
 <div class="row"><div><h2 style="margin:0">Daily commitments</h2><div class="sub">10 PM reminder · day closes at 11:59 PM</div><div class="sub" style="margin-top:4px">Tap a checked ✓ again to uncheck it.</div></div><div class="actions"><button class="btn good" id="useOff">🎟️ Off Day</button><button class="btn warn" id="useSick">🤒 Sick Off</button></div></div>
 <div class="contracts" id="dailyList" style="margin-top:15px"></div>
 </div>
+<div class="card" style="margin-top:16px"><div class="row"><div><h2 style="margin:0">Weekly & monthly</h2><div class="sub">Tracked separately from your daily 80% score.</div></div><button class="btn" onclick="document.querySelector('[data-tab=\"contracts\"]').click()">View contracts</button></div><div id="periodSummary" style="margin-top:12px"></div></div>
 <div class="grid2" style="margin-top:16px">
 <div class="card"><div class="row"><h3>10 PM check-in</h3><span class="tag" id="reminderStatus">Enabled</span></div><p class="sub">At 10 PM, Winter Arc reminds you about unfinished daily commitments. Enable browser notifications for the reminder when available.</p><button class="btn primary" id="notify">Enable reminder</button></div>
 <div class="card"><h3>Protection history</h3><div id="history" class="sub">No protected days yet.</div></div>
@@ -131,8 +132,24 @@ function bestStreak(){let start=new Date(state.start+"T12:00"),end=new Date();le
 function refreshSick(){if(state.sick.month!==monthKey()){state.sick={month:monthKey(),used:0};save()}}
 function evaluateDay(d=today()){let cs=activeDaily();if(state.days[d])return state.days[d];if(cs.length&&dailyPct(d)>=80)return state.days[d]="done";return null}
 function completeToday(){return dailyPct(today())>=80}
-function protect(kind){if(kind==="off"){if(state.offDays<1)return showToast("No earned Off Day available.");state.offDays--;state.days[today()]="off";snapshotDay(today());state.history.unshift({date:today(),kind:"Earned Off Day"});save();render();showToast("🎟️ Off Day used. Streak protected.");}
-else{refreshSick();if(state.sick.used>=2)return showToast("No Sick Offs left this month.");state.sick.used++;state.days[today()]="sick";snapshotDay(today());state.history.unshift({date:today(),kind:"Sick Off"});save();render();showToast("🤒 Sick Off used. Streak protected.");}}
+function protect(kind){
+  const d=today(), current=state.days[d];
+  if(current===kind){
+    if(kind==="off") state.offDays=Math.min(3,state.offDays+1);
+    else state.sick.used=Math.max(0,state.sick.used-1);
+    delete state.days[d];
+    state.history=state.history.filter(h=>!(h.date===d && h.kind===(kind==="off"?"Earned Off Day":"Sick Off")));
+    snapshotDay(d); save(); render(); showToast(kind==="off"?"🎟️ Off Day cancelled.":"🤒 Sick Off cancelled."); return;
+  }
+  if(current) return showToast("Cancel today’s current leave first.");
+  if(kind==="off"){
+    if(state.offDays<1)return showToast("No earned Off Day available.");
+    state.offDays--; state.days[d]="off"; snapshotDay(d); state.history.unshift({date:d,kind:"Earned Off Day"}); save(); render(); showToast("🎟️ Off Day used. Tap again to cancel.");
+  } else {
+    refreshSick(); if(state.sick.used>=2)return showToast("No Sick Offs left this month.");
+    state.sick.used++; state.days[d]="sick"; snapshotDay(d); state.history.unshift({date:d,kind:"Sick Off"}); save(); render(); showToast("🤒 Sick Off used. Tap again to cancel.");
+  }
+}
 function processDay(){let d=today();if(state.days[d])return;if(completeToday()){state.days[d]="done";let s=streak();if(s>0&&s%5===0&&state.offDays<3){state.offDays++;showToast("🎟️ You earned an Off Day!")}save();render()}}
 function render(){
 refreshSick();snapshotDay(today());save();let cs=activeDaily(),done=cs.filter(c=>isDone(today(),c.id)).length,pct=cs.length?Math.round(done/cs.length*100):100,s=streak(),best=bestStreak();
@@ -149,9 +166,15 @@ document.getElementById("dailyScore").textContent=pct+"%";document.getElementByI
 document.getElementById("streak").textContent=s;document.getElementById("best").textContent=best;document.getElementById("best2").textContent=best;
 let rem=Math.max(0,cs.length-done);document.getElementById("remaining").textContent=rem;document.getElementById("contractCount").textContent=state.contracts.filter(c=>c.active).length;document.getElementById("monthName").textContent=new Date().toLocaleDateString(undefined,{month:"short"});
 document.getElementById("offs").textContent=state.offDays+" / 3";document.getElementById("offBar").style.width=(state.offDays/3*100)+"%";document.getElementById("sick").textContent=(2-state.sick.used)+" / 2";
-document.getElementById("useOff").disabled=state.offDays<1;document.getElementById("useSick").disabled=state.sick.used>=2;
+const todayLeave=state.days[today()];
+document.getElementById("useOff").disabled=(todayLeave && todayLeave!=="off") || (!todayLeave && state.offDays<1);
+document.getElementById("useSick").disabled=(todayLeave && todayLeave!=="sick") || (!todayLeave && state.sick.used>=2);
+document.getElementById("useOff").textContent=todayLeave==="off"?"🎟️ Cancel Off Day":"🎟️ Off Day";
+document.getElementById("useSick").textContent=todayLeave==="sick"?"🤒 Cancel Sick Off":"🤒 Sick Off";
 document.getElementById("dailyList").innerHTML=cs.map(c=>{const done=isDone(today(),c.id);return `<div class="contract"><button type="button" aria-pressed="${done}" title="${done?"Tap to uncheck":"Tap to check"}" class="check ${done?"done":""}" onclick="toggle(${c.id})">${done?"✓":""}</button><div class="contract-main"><strong>${c.name}</strong><small>${c.name.includes("2000")?"Limit: under 2000 cal":(c.type==="target"?"Target: "+c.target:"Complete once")} · Daily</small></div><span class="tag">${done?"Done · tap ✓ to undo":"Not done"}</span></div>`}).join("")||'<div class="empty">No daily contracts.</div>';
 const activeContracts=state.contracts.filter(c=>c.active);
+const weekly=activeContracts.filter(c=>c.freq==="weekly"), monthly=activeContracts.filter(c=>c.freq==="monthly");
+document.getElementById("periodSummary").innerHTML=(weekly.length?`<div class="sub" style="margin-bottom:6px"><b>WEEKLY</b> · ${weekly.map(c=>`${isPeriodDone("weekly",c.id)?"✓":"☐"} ${c.name}`).join(" · ")}</div>`:"<div class=\"sub\">No weekly contracts.</div>")+(monthly.length?`<div class="sub"><b>MONTHLY</b> · ${monthly.map(c=>`${isPeriodDone("monthly",c.id)?"✓":"☐"} ${c.name}`).join(" · ")}</div>`:"<div class=\"sub\">No monthly contracts.</div>");
 const groups=[["daily","DAILY","Your everyday commitments."],["weekly","WEEKLY","Complete once during the current week."],["monthly","MONTHLY","Complete once during the current month."]];
 document.getElementById("contractGroups").innerHTML=groups.map(([freq,title,desc])=>{
   const list=activeContracts.filter(c=>c.freq===freq);
