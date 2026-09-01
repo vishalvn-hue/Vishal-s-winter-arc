@@ -94,7 +94,7 @@ function dayDiff(a,b){return Math.floor((new Date(b)-new Date(a))/86400000)}
 function activeDaily(){return state.contracts.filter(c=>c.active&&c.freq==="daily")}
 function checkKey(d,id){return d+"_"+id}
 function isDone(d,c){return !!state.checks[checkKey(d,c.id)]}
-function setDone(c,val=true){state.checks[checkKey(today(),c.id)]=val;save();render()}
+function setDone(c,val=true){const k=checkKey(today(),c.id);if(val===false)delete state.checks[k];else state.checks[k]=true;save();render()}
 function streak(){let s=0,d=new Date();while(true){let k=d.toISOString().slice(0,10), rec=state.days[k];if(rec==="done"){s++;d.setDate(d.getDate()-1)}else if(rec==="off"||rec==="sick"){break}else{break}}return s}
 function bestStreak(){let dates=Object.keys(state.days).sort(),best=0,cur=0,prev=null;for(const d of dates){if(state.days[d]==="done"){if(prev&&dayDiff(prev,d)===1)cur++;else cur=1;best=Math.max(best,cur);prev=d}else if(state.days[d]==="off"||state.days[d]==="sick"){prev=d}else{cur=0;prev=null}}return best}
 function refreshSick(){if(state.sick.month!==monthKey()){state.sick={month:monthKey(),used:0};save()}}
