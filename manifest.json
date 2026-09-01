@@ -1,0 +1,9 @@
+{
+  "name": "Vishal’s Winter Arc",
+  "short_name": "Winter Arc",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#07101c",
+  "theme_color": "#0b1220",
+  "description": "Vishal’s personal Winter Arc contract tracker."
+}
