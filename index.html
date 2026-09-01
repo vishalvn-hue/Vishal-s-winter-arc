@@ -50,7 +50,7 @@ button,input,select{font:inherit}button{cursor:pointer;border:0}.app{max-width:1
 
 <section id="today" class="section active">
 <div class="card">
-<div class="row"><div><h2 style="margin:0">Daily commitments</h2><div class="sub">10 PM reminder · day closes at 11:59 PM</div></div><div class="actions"><button class="btn good" id="useOff">🎟️ Off Day</button><button class="btn warn" id="useSick">🤒 Sick Off</button></div></div>
+<div class="row"><div><h2 style="margin:0">Daily commitments</h2><div class="sub">10 PM reminder · day closes at 11:59 PM</div><div class="sub" style="margin-top:4px">Tap a checked ✓ again to uncheck it.</div></div><div class="actions"><button class="btn good" id="useOff">🎟️ Off Day</button><button class="btn warn" id="useSick">🤒 Sick Off</button></div></div>
 <div class="contracts" id="dailyList" style="margin-top:15px"></div>
 </div>
 <div class="grid2" style="margin-top:16px">
@@ -135,7 +135,7 @@ document.getElementById("streak").textContent=s;document.getElementById("best").
 let rem=Math.max(0,cs.length-done);document.getElementById("remaining").textContent=rem;document.getElementById("contractCount").textContent=state.contracts.filter(c=>c.active).length;document.getElementById("monthName").textContent=new Date().toLocaleDateString(undefined,{month:"short"});
 document.getElementById("offs").textContent=state.offDays+" / 3";document.getElementById("offBar").style.width=(state.offDays/3*100)+"%";document.getElementById("sick").textContent=(2-state.sick.used)+" / 2";
 document.getElementById("useOff").disabled=state.offDays<1;document.getElementById("useSick").disabled=state.sick.used>=2;
-document.getElementById("dailyList").innerHTML=cs.map(c=>`<div class="contract"><button class="check ${isDone(today(),c)?"done":""}" onclick="toggle(${c.id})">${isDone(today(),c)?"✓":""}</button><div class="contract-main"><strong>${c.name}</strong><small>${c.name.includes("2000")?"Limit: under 2000 cal":(c.name.includes("2000")?"Limit: under 2000 cal":(c.type==="target"?"Target: "+c.target:"Complete once"))} · Daily</small></div></div>`).join("")||'<div class="empty">No daily contracts.</div>';
+document.getElementById("dailyList").innerHTML=cs.map(c=>{const done=isDone(today(),c.id);return `<div class="contract"><button type="button" aria-pressed="${done}" title="${done?"Tap to uncheck":"Tap to check"}" class="check ${done?"done":""}" onclick="toggle(${c.id})">${done?"✓":""}</button><div class="contract-main"><strong>${c.name}</strong><small>${c.name.includes("2000")?"Limit: under 2000 cal":(c.type==="target"?"Target: "+c.target:"Complete once")} · Daily</small></div><span class="tag">${done?"Done · tap ✓ to undo":"Not done"}</span></div>`}).join("")||'<div class="empty">No daily contracts.</div>';
 document.getElementById("allContracts").innerHTML=state.contracts.map(c=>`<div class="contract"><div class="contract-main"><strong>${c.name}</strong><small>${c.freq} · ${c.type}${c.type==="target"?" · "+c.target:""}</small></div><span class="tag">${c.active?"Active":"Retired"}</span><button class="btn" onclick="retire(${c.id})">${c.active?"Retire":"Restore"}</button></div>`).join("");
 document.getElementById("history").innerHTML=state.history.slice(0,8).map(h=>`<div style="padding:6px 0">• ${h.date} · ${h.kind}</div>`).join("")||"No protected days yet.";
 let start=new Date(state.start+"T12:00");
@@ -155,7 +155,7 @@ document.getElementById("milestones").innerHTML=`<div class="contract" style="ma
 document.getElementById("vaultList").innerHTML=state.vault.length?state.vault.map(v=>`<div class="contract"><div class="contract-main"><strong>${v.title}</strong><small>${v.date} · ${v.text}</small></div></div>`).join(""):'<div class="empty">Your comics, lessons and memories can live here.</div>';
 save();
 }
-function toggle(id){const c=state.contracts.find(x=>x.id===Number(id));if(!c)return;const done=isDone(today(),c.id);setDone(c,!done);showToast(done?"Unchecked.":"Checked.");return false}
+function toggle(id){const c=state.contracts.find(x=>x.id===Number(id));if(!c)return;const wasDone=isDone(today(),c.id);setDone(c,!wasDone);showToast(wasDone?"Unchecked.":"Checked.");return false}
 function retire(id){let c=state.contracts.find(x=>x.id===id);c.active=!c.active;save();render()}
 document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));document.getElementById(b.dataset.tab).classList.add("active")});
 document.getElementById("useOff").onclick=()=>protect("off");document.getElementById("useSick").onclick=()=>protect("sick");
