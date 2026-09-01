@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1220">
+<title>Vishal's Winter Arc</title>
+<style>
+:root{--bg:#07101c;--panel:#0d1928;--panel2:#111f31;--text:#eef5ff;--muted:#91a3b8;--line:#203247;--ice:#8fd3ff;--good:#7ee2a8;--warn:#ffd27d;--bad:#ff8f9b}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 70% -10%,#183a58 0,#07101c 38%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select{font:inherit}button{cursor:pointer;border:0}.app{max-width:1100px;margin:auto;padding:22px 18px 80px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:22px}.brand{font-size:26px;font-weight:800;letter-spacing:-.03em}.brand span{color:var(--ice)}.sub{color:var(--muted);font-size:13px}.pill{background:#13263a;border:1px solid var(--line);padding:9px 12px;border-radius:999px;color:#d7e8f8;font-size:12px}
+.hero{display:grid;grid-template-columns:1.5fr .8fr;gap:16px}.card{background:linear-gradient(180deg,rgba(18,34,52,.96),rgba(10,22,36,.96));border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 15px 50px rgba(0,0,0,.18)}.hero h1{font-size:42px;margin:4px 0 8px;letter-spacing:-.05em}.hero p{color:var(--muted);margin:0}.score{display:flex;align-items:end;justify-content:space-between;margin-top:26px}.score b{font-size:36px}.progress{height:9px;background:#17283a;border-radius:20px;overflow:hidden;margin-top:10px}.progress i{display:block;height:100%;background:linear-gradient(90deg,#76bff0,#a7e7ff);border-radius:20px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}.stat b{display:block;font-size:25px;margin-top:5px}.label{color:var(--muted);font-size:12px}.nav{display:flex;gap:8px;margin:18px 0;overflow:auto}.nav button{background:transparent;color:var(--muted);padding:10px 13px;border-radius:12px}.nav button.active{background:#162a40;color:#fff}
+.section{display:none}.section.active{display:block}.row{display:flex;align-items:center;justify-content:space-between;gap:12px}.contracts{display:grid;gap:10px}.contract-group{margin-top:18px}.contract-group:first-child{margin-top:0}.group-title{font-size:14px;font-weight:800;letter-spacing:.04em;color:#dbeafa;margin-bottom:8px}.period-meta{color:var(--muted);font-size:11px;margin-bottom:10px}.period-check{width:40px;height:40px;min-width:40px;border-radius:11px;background:#17293b;border:1px solid #2b4259;color:#06101b;font-weight:900;font-size:21px;display:grid;place-items:center;cursor:pointer}.period-check.done{background:var(--good);border-color:var(--good)}.contract{display:flex;align-items:center;gap:12px;background:#0d1b2b;border:1px solid #1d3045;padding:13px;border-radius:16px}.heat-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;color:var(--muted);font-size:12px}.legend{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px;background:#17293b}.legend.green{background:#49d69a}.legend.amber{background:#f2b84b}.legend.red{background:#ef5b5b}.legend.protected{background:#8b78e6}.heatmap-wrap{overflow-x:auto;padding:12px 0 4px}.weekday-labels{display:grid;grid-template-rows:repeat(7,20px);gap:4px;width:34px;float:left;color:var(--muted);font-size:9px;align-items:center}.heatmap{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,18px);grid-auto-columns:18px;gap:4px;margin-left:42px;min-width:max-content}.heatday{width:18px;height:18px;border-radius:4px;background:#17293b;border:1px solid #233a50;position:relative}.heatday.green{background:#49d69a;border-color:#49d69a}.heatday.amber{background:#f2b84b;border-color:#f2b84b}.heatday.red{background:#ef5b5b;border-color:#ef5b5b}.heatday.protected{background:#8b78e6;border-color:#8b78e6}.heatday.future{opacity:.22}.heatday.empty{visibility:hidden}.heat-note{margin-top:12px;color:var(--muted);font-size:12px}.check{width:44px;height:44px;min-width:44px;border-radius:12px;background:#17293b;border:1px solid #2b4259;color:#06101b;font-weight:900;font-size:24px;display:grid;place-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent}.check.done{background:var(--good);border-color:var(--good)}.contract-main{flex:1}.contract-main strong{display:block}.contract-main small{color:var(--muted)}.tag{font-size:10px;border:1px solid #294159;border-radius:999px;padding:5px 8px;color:#b5c9dc}.empty{color:var(--muted);padding:25px;text-align:center}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{padding:10px 14px;border-radius:12px;background:#18324a;color:white;border:1px solid #2b4964}.btn.primary{background:#9adfff;color:#07101c;border-color:#9adfff;font-weight:800}.btn.good{background:#173a2a;border-color:#285f45;color:#a6efc5}.btn.warn{background:#3c3020;border-color:#725c35;color:#ffe1a4}.btn.bad{background:#3c2027;border-color:#6c3742;color:#ffb3bc}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.day{aspect-ratio:1;border-radius:6px;background:#142537;border:1px solid #20364b}.day.done{background:#1f5a43}.day.protected{background:#4a4630}.day.missed{background:#5a2730}.day.future{opacity:.35}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:18px}.modal.show{display:flex}.modalbox{width:min(520px,100%);background:#0d1928;border:1px solid #294158;border-radius:22px;padding:20px}.modalbox input,.modalbox select{width:100%;margin:7px 0 14px;background:#08131f;color:white;border:1px solid #294158;border-radius:10px;padding:11px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#eaf7ff;color:#07101c;padding:11px 16px;border-radius:999px;font-weight:700;display:none;z-index:5}
+@media(max-width:760px){.hero{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.hero h1{font-size:34px}.top{align-items:flex-start}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><div><div class="brand">❄️ Vishal’s <span>Winter Arc</span></div><div class="sub">Your contract with yourself. · Sep → Feb</div></div><div class="pill" id="datePill"></div></header>
+
+<div class="hero">
+<div class="card">
+<div class="sub">TODAY'S CONTRACT</div>
+<h1 id="dayTitle">Day 1</h1><p id="arcDates"></p>
+<div class="score"><div><span class="label">Daily completion</span><br><b id="dailyScore">0%</b></div><div class="label" id="dailyCount">0 / 0</div></div>
+<div class="progress"><i id="scoreBar" style="width:0%"></i></div>
+</div>
+<div class="card">
+<div class="label">🔥 CURRENT STREAK</div><div style="font-size:44px;font-weight:850;margin:5px 0" id="streak">0</div>
+<div class="label">Best <b id="best">0</b> · Next off day in <b id="nextReward">5</b> completed days</div>
+<div style="margin-top:18px" class="row"><span>🎟️ Earned Off Days</span><b id="offs">0 / 3</b></div>
+<div class="progress"><i id="offBar" style="width:0%"></i></div>
+<div class="row" style="margin-top:14px"><span>🤒 Sick Offs</span><b id="sick">2 / 2</b></div>
+</div></div>
+
+<div class="stats">
+<div class="card stat"><span class="label">TODAY</span><b id="remaining">0</b><span class="label">remaining</span></div>
+<div class="card stat"><span class="label">CONTRACTS</span><b id="contractCount">0</b><span class="label">active</span></div>
+<div class="card stat"><span class="label">BEST STREAK</span><b id="best2">0</b><span class="label">days</span></div>
+<div class="card stat"><span class="label">MONTH</span><b id="monthName">—</b><span class="label">sick offs reset monthly</span></div>
+</div>
+
+<nav class="nav">
+<button class="active" data-tab="today">Today</button><button data-tab="contracts">Contracts</button><button data-tab="arc">Arc</button><button data-tab="vault">Vault</button>
+</nav>
+
+<section id="today" class="section active">
+<div class="card">
+<div class="row"><div><h2 style="margin:0">Daily commitments</h2><div class="sub">10 PM reminder · day closes at 11:59 PM</div><div class="sub" style="margin-top:4px">Tap a checked ✓ again to uncheck it.</div></div><div class="actions"><button class="btn good" id="useOff">🎟️ Off Day</button><button class="btn warn" id="useSick">🤒 Sick Off</button></div></div>
+<div class="contracts" id="dailyList" style="margin-top:15px"></div>
+</div>
+<div class="card" style="margin-top:16px"><div class="row"><div><h2 style="margin:0">Weekly & monthly</h2><div class="sub">Tracked separately from your daily 80% score.</div></div><button class="btn" onclick="document.querySelector('[data-tab=\"contracts\"]').click()">View contracts</button></div><div id="periodSummary" style="margin-top:12px"></div></div>
+<div class="grid2" style="margin-top:16px">
+<div class="card"><div class="row"><h3>10 PM check-in</h3><span class="tag" id="reminderStatus">Enabled</span></div><p class="sub">At 10 PM, Winter Arc reminds you about unfinished daily commitments. Enable browser notifications for the reminder when available.</p><button class="btn primary" id="notify">Enable reminder</button></div>
+<div class="card"><h3>Protection history</h3><div id="history" class="sub">No protected days yet.</div></div>
+</div>
+</section>
+
+<section id="contracts" class="section">
+<div class="card"><div class="row"><div><h2 style="margin:0">Your contracts</h2><div class="sub">Daily habits stay on Today. Weekly and monthly contracts are tracked here.</div></div><button class="btn primary" id="addContract">＋ Add contract</button></div>
+<div id="contractGroups" style="margin-top:15px"></div></div>
+</section>
+
+<section id="arc" class="section">
+<div class="card">
+<h2 style="margin-top:0">Streak heat map</h2>
+<div class="sub">100% = green · 80–99% = amber · below 80% = red · leave = protected</div>
+<div class="heat-legend">
+<span><i class="legend green"></i>100%</span>
+<span><i class="legend amber"></i>80–99%</span>
+<span><i class="legend red"></i>&lt;80%</span>
+<span><i class="legend protected"></i>Leave</span>
+</div>
+<div class="heatmap-wrap"><div class="weekday-labels"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div><div class="heatmap" id="calendar"></div></div>
+<div class="heat-note" id="heatNote"></div>
+</div>
+<div class="grid2" style="margin-top:16px">
+<div class="card"><h2 style="margin-top:0">Milestones</h2><div id="milestones"></div></div>
+<div class="card"><h2 style="margin-top:0">How your streak works</h2><div class="sub">A day counts toward your streak when you reach at least 80% of your daily contracts. 100% is a perfect day. Below 80% is a red day and can be protected with an earned Off Day or Sick Off.</div></div>
+</div>
+</section>
+
+<section id="vault" class="section">
+<div class="card"><div class="row"><div><h2 style="margin:0">Vault</h2><div class="sub">Keep the memories behind the contract.</div></div><button class="btn primary" id="addMemory">＋ Add memory</button></div><div id="vaultList" style="margin-top:15px"></div></div>
+</section>
+</div>
+
+<div class="modal" id="modal"><div class="modalbox"><h2 id="modalTitle">Add contract</h2>
+<label class="label">Contract name</label><input id="cName" placeholder="e.g. Journal">
+<label class="label">Frequency</label><select id="cFreq"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option></select>
+<label class="label">Type</label><select id="cType"><option value="binary">Done / not done</option><option value="target">Target</option></select>
+<label class="label">Target (optional)</label><input id="cTarget" type="number" min="0" step="0.1" placeholder="e.g. 3">
+<div class="actions"><button class="btn" id="cancelModal">Cancel</button><button class="btn primary" id="saveContract">Save</button></div>
+</div></div>
+<div class="toast" id="toast"></div>
+<script>
+const KEY="winterArcV1";
+const seed=[
+["🚶 Walk","daily","target",1],["🏋️ Workout","daily","binary",1],["🍽️ Less than 2000 cal intake","daily","target",2000],["✍️ Create a comic","daily","binary",1],["🧠 Learn something new","daily","binary",1],["🌿 Open-air breathing","daily","binary",1],["👨‍👩‍👧 Drive / fun time with family","weekly","binary",1],["🚗 Long drive","monthly","binary",1],["🍎 Eat a fruit","daily","binary",1],["🥦 Eat a vegetable","daily","binary",1],["🍽️ Restaurant meal","monthly","binary",1],["🎵 Retro song","daily","binary",1],["♟️ Game of chess","daily","binary",1],["🧩 Brain teaser","daily","binary",1],["💧 Adequate water","daily","target",1]];
+let state=JSON.parse(localStorage.getItem(KEY)||"null")||{start:today(),contracts:seed.map((x,i)=>({id:i+1,name:x[0],freq:x[1],type:x[2],target:x[3],active:true,created:today()})),checks:{},days:{},dayStats:{},offDays:0,sick:{month:monthKey(),used:0},history:[],vault:[]};
+if(!state.dayStats)state.dayStats={};
+function today(){return new Date().toISOString().slice(0,10)} function monthKey(d=today()){return d.slice(0,7)}
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function showToast(t){let e=document.getElementById("toast");e.textContent=t;e.style.display="block";setTimeout(()=>e.style.display="none",2200)}
+function dayDiff(a,b){return Math.floor((new Date(b)-new Date(a))/86400000)}
+function activeDaily(){return state.contracts.filter(c=>c.active&&c.freq==="daily")}
+function checkKey(d,id){return d+"_"+id}
+function periodKey(freq,d=today()){
+  const dt=new Date(d+"T12:00");
+  if(freq==="monthly") return d.slice(0,7);
+  const day=(dt.getDay()+6)%7;
+  dt.setDate(dt.getDate()-day);
+  return dt.toISOString().slice(0,10);
+}
+function isPeriodDone(freq,id,d=today()){return !!state.checks[periodKey(freq,d)+"_"+id]}
+function setPeriodDone(c,val=true){
+  const k=periodKey(c.freq)+"_"+c.id;
+  if(val===false) delete state.checks[k]; else state.checks[k]=true;
+  save(); render();
+}
+function isDone(d,c){const id=typeof c==="object"?c.id:c;return !!state.checks[checkKey(d,id)]}
+function setDone(c,val=true){const k=checkKey(today(),c.id);if(val===false)delete state.checks[k];else state.checks[k]=true;snapshotDay(today());save();render()}
+function dailyPct(d){if(state.dayStats[d]&&state.dayStats[d].total>0)return state.dayStats[d].pct;let cs=activeDaily();if(!cs.length)return 100;let done=cs.filter(c=>isDone(d,c.id)).length;return Math.round(done/cs.length*100)}
+function snapshotDay(d=today()){let cs=activeDaily(),done=cs.filter(c=>isDone(d,c.id)).length;state.dayStats[d]={done,total:cs.length,pct:cs.length?Math.round(done/cs.length*100):100};}
+function qualifies(d){return dailyPct(d)>=80}
+function streak(){let s=0,d=new Date();while(true){let k=d.toISOString().slice(0,10),rec=state.days[k];if(rec==="off"||rec==="sick"){s++;d.setDate(d.getDate()-1);continue}if(qualifies(k)){s++;d.setDate(d.getDate()-1);continue}break}return s}
+function bestStreak(){let start=new Date(state.start+"T12:00"),end=new Date();let best=0,cur=0;for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1)){let k=d.toISOString().slice(0,10),rec=state.days[k];if(rec==="off"||rec==="sick"||qualifies(k)){cur++;best=Math.max(best,cur)}else{cur=0}}return best}
+function refreshSick(){if(state.sick.month!==monthKey()){state.sick={month:monthKey(),used:0};save()}}
+function evaluateDay(d=today()){let cs=activeDaily();if(state.days[d])return state.days[d];if(cs.length&&dailyPct(d)>=80)return state.days[d]="done";return null}
+function completeToday(){return dailyPct(today())>=80}
+function protect(kind){
+  const d=today(), current=state.days[d];
+  if(current===kind){
+    if(kind==="off") state.offDays=Math.min(3,state.offDays+1);
+    else state.sick.used=Math.max(0,state.sick.used-1);
+    delete state.days[d];
+    state.history=state.history.filter(h=>!(h.date===d && h.kind===(kind==="off"?"Earned Off Day":"Sick Off")));
+    snapshotDay(d); save(); render(); showToast(kind==="off"?"🎟️ Off Day cancelled.":"🤒 Sick Off cancelled."); return;
+  }
+  if(current) return showToast("Cancel today’s current leave first.");
+  if(kind==="off"){
+    if(state.offDays<1)return showToast("No earned Off Day available.");
+    state.offDays--; state.days[d]="off"; snapshotDay(d); state.history.unshift({date:d,kind:"Earned Off Day"}); save(); render(); showToast("🎟️ Off Day used. Tap again to cancel.");
+  } else {
+    refreshSick(); if(state.sick.used>=2)return showToast("No Sick Offs left this month.");
+    state.sick.used++; state.days[d]="sick"; snapshotDay(d); state.history.unshift({date:d,kind:"Sick Off"}); save(); render(); showToast("🤒 Sick Off used. Tap again to cancel.");
+  }
+}
+function processDay(){let d=today();if(state.days[d])return;if(completeToday()){state.days[d]="done";let s=streak();if(s>0&&s%5===0&&state.offDays<3){state.offDays++;showToast("🎟️ You earned an Off Day!")}save();render()}}
+function render(){
+refreshSick();snapshotDay(today());save();let cs=activeDaily(),done=cs.filter(c=>isDone(today(),c.id)).length,pct=cs.length?Math.round(done/cs.length*100):100,s=streak(),best=bestStreak();
+document.getElementById("datePill").textContent=new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
+const startDate = new Date(state.start+"T12:00");
+const endYear = startDate.getMonth() >= 8 ? startDate.getFullYear()+1 : startDate.getFullYear();
+const endDate = new Date(endYear, 2, 0, 12, 0);
+const totalArcDays = Math.round((endDate-startDate)/86400000)+1;
+const currentDay = Math.min(totalArcDays, Math.max(1, dayDiff(state.start,today())+1));
+const fmt = d => d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
+document.getElementById("dayTitle").textContent="Day "+currentDay+" of "+totalArcDays;
+document.getElementById("arcDates").textContent=fmt(startDate)+" → "+fmt(endDate);
+document.getElementById("dailyScore").textContent=pct+"%";document.getElementById("dailyCount").textContent=done+" / "+cs.length;document.getElementById("scoreBar").style.width=pct+"%";
+document.getElementById("streak").textContent=s;document.getElementById("best").textContent=best;document.getElementById("best2").textContent=best;
+let rem=Math.max(0,cs.length-done);document.getElementById("remaining").textContent=rem;document.getElementById("contractCount").textContent=state.contracts.filter(c=>c.active).length;document.getElementById("monthName").textContent=new Date().toLocaleDateString(undefined,{month:"short"});
+document.getElementById("offs").textContent=state.offDays+" / 3";document.getElementById("offBar").style.width=(state.offDays/3*100)+"%";document.getElementById("sick").textContent=(2-state.sick.used)+" / 2";
+const todayLeave=state.days[today()];
+document.getElementById("useOff").disabled=(todayLeave && todayLeave!=="off") || (!todayLeave && state.offDays<1);
+document.getElementById("useSick").disabled=(todayLeave && todayLeave!=="sick") || (!todayLeave && state.sick.used>=2);
+document.getElementById("useOff").textContent=todayLeave==="off"?"🎟️ Cancel Off Day":"🎟️ Off Day";
+document.getElementById("useSick").textContent=todayLeave==="sick"?"🤒 Cancel Sick Off":"🤒 Sick Off";
+document.getElementById("dailyList").innerHTML=cs.map(c=>{const done=isDone(today(),c.id);return `<div class="contract"><button type="button" aria-pressed="${done}" title="${done?"Tap to uncheck":"Tap to check"}" class="check ${done?"done":""}" onclick="toggle(${c.id})">${done?"✓":""}</button><div class="contract-main"><strong>${c.name}</strong><small>${c.name.includes("2000")?"Limit: under 2000 cal":(c.type==="target"?"Target: "+c.target:"Complete once")} · Daily</small></div><span class="tag">${done?"Done · tap ✓ to undo":"Not done"}</span></div>`}).join("")||'<div class="empty">No daily contracts.</div>';
+const activeContracts=state.contracts.filter(c=>c.active);
+const weekly=activeContracts.filter(c=>c.freq==="weekly"), monthly=activeContracts.filter(c=>c.freq==="monthly");
+document.getElementById("periodSummary").innerHTML=(weekly.length?`<div class="sub" style="margin-bottom:6px"><b>WEEKLY</b> · ${weekly.map(c=>`${isPeriodDone("weekly",c.id)?"✓":"☐"} ${c.name}`).join(" · ")}</div>`:"<div class=\"sub\">No weekly contracts.</div>")+(monthly.length?`<div class="sub"><b>MONTHLY</b> · ${monthly.map(c=>`${isPeriodDone("monthly",c.id)?"✓":"☐"} ${c.name}`).join(" · ")}</div>`:"<div class=\"sub\">No monthly contracts.</div>");
+const groups=[["daily","DAILY","Your everyday commitments."],["weekly","WEEKLY","Complete once during the current week."],["monthly","MONTHLY","Complete once during the current month."]];
+document.getElementById("contractGroups").innerHTML=groups.map(([freq,title,desc])=>{
+  const list=activeContracts.filter(c=>c.freq===freq);
+  if(!list.length)return "";
+  return `<div class="contract-group"><div class="group-title">${title} · ${list.length}</div><div class="period-meta">${desc}</div><div class="contracts">${list.map(c=>{
+    if(freq==="daily"){
+      const done=isDone(today(),c.id);
+      return `<div class="contract"><button type="button" aria-pressed="${done}" class="check ${done?"done":""}" onclick="toggle(${c.id})">${done?"✓":""}</button><div class="contract-main"><strong>${c.name}</strong><small>${c.type==="target"?"Target: "+c.target:"Complete once"} · Daily</small></div><span class="tag">${done?"Done":"Not done"}</span><button class="btn" onclick="retire(${c.id})">Retire</button></div>`;
+    }
+    const done=isPeriodDone(freq,c.id);
+    const periodLabel=freq==="weekly"?"This week":"This month";
+    return `<div class="contract"><button type="button" aria-pressed="${done}" class="period-check ${done?"done":""}" onclick="togglePeriod(${c.id})">${done?"✓":""}</button><div class="contract-main"><strong>${c.name}</strong><small>${periodLabel} · ${c.type==="target"?"Target: "+c.target:"1 completion required"}</small></div><span class="tag">${done?"Done":"Not done"}</span><button class="btn" onclick="retire(${c.id})">Retire</button></div>`;
+  }).join("")}</div></div>`;
+}).join("") + `<div class="contract-group"><div class="group-title">RETIRED</div><div class="contracts">${state.contracts.filter(c=>!c.active).map(c=>`<div class="contract"><div class="contract-main"><strong>${c.name}</strong><small>${c.freq} · retired</small></div><button class="btn" onclick="retire(${c.id})">Restore</button></div>`).join("") || '<div class="empty">No retired contracts.</div>'}</div></div>`;
+document.getElementById("history").innerHTML=state.history.slice(0,8).map(h=>`<div style="padding:6px 0">• ${h.date} · ${h.kind}</div>`).join("")||"No protected days yet.";
+let start=new Date(state.start+"T12:00");
+const arcEnd=new Date(start.getFullYear()+(start.getMonth()>=8?1:0),2,0,12,0);
+let heat="";
+const firstDow=(start.getDay()+6)%7;
+for(let i=0;i<firstDow;i++) heat+=`<div class="heatday empty"></div>`;
+for(let d=new Date(start);d<=arcEnd;d.setDate(d.getDate()+1)){
+  let k=d.toISOString().slice(0,10),future=d>new Date();
+  let rec=state.days[k], pct=dailyPct(k), cls=future?"future":(rec==="off"||rec==="sick"?"protected":pct===100?"green":pct>=80?"amber":"red");
+  let label=rec==="off"?"Off Day":rec==="sick"?"Sick Off":future?"Future":pct+"%";
+  heat+=`<div class="heatday ${cls}" title="${k} · ${label}"></div>`;
+}
+document.getElementById("calendar").innerHTML=heat;
+let noteToday=dailyPct(today());document.getElementById("heatNote").textContent=state.days[today()]==="off"?"Today is protected by an Off Day.":state.days[today()]==="sick"?"Today is protected by a Sick Off.":"Today: "+noteToday+"% complete · "+(noteToday>=80?"counts toward your streak":"below 80% • use leave if needed");
+document.getElementById("milestones").innerHTML=`<div class="contract" style="margin-bottom:8px">🔥 Current streak <b>${s} days</b></div><div class="contract" style="margin-bottom:8px">🎟️ Next earned Off Day <b>${5-(s%5||5)} days</b></div><div class="contract">🤒 Sick Offs left <b>${2-state.sick.used}</b></div>`;
+document.getElementById("vaultList").innerHTML=state.vault.length?state.vault.map(v=>`<div class="contract"><div class="contract-main"><strong>${v.title}</strong><small>${v.date} · ${v.text}</small></div></div>`).join(""):'<div class="empty">Your comics, lessons and memories can live here.</div>';
+save();
+}
+function toggle(id){const c=state.contracts.find(x=>x.id===Number(id));if(!c)return;const wasDone=isDone(today(),c.id);setDone(c,!wasDone);showToast(wasDone?"Unchecked.":"Checked.");return false}
+function togglePeriod(id){const c=state.contracts.find(x=>x.id===Number(id));if(!c||c.freq==="daily")return;const wasDone=isPeriodDone(c.freq,c.id);setPeriodDone(c,!wasDone);showToast(wasDone?"Unchecked.":"Checked.");return false}
+function retire(id){let c=state.contracts.find(x=>x.id===Number(id));if(!c)return;if(c.active){if(!confirm(`Retire "${c.name}"? It will stop being required from now on. Your past history will be preserved.`))return;c.active=false;c.retiredOn=today();showToast("Contract retired. History preserved.");}else{c.active=true;delete c.retiredOn;showToast("Contract restored.");}save();render()}
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));document.getElementById(b.dataset.tab).classList.add("active")});
+document.getElementById("useOff").onclick=()=>protect("off");document.getElementById("useSick").onclick=()=>protect("sick");
+document.getElementById("notify").onclick=async()=>{if(!("Notification"in window))return showToast("Notifications aren't supported here.");let p=await Notification.requestPermission();document.getElementById("reminderStatus").textContent=p==="granted"?"Enabled":"Blocked";showToast(p==="granted"?"10 PM reminder enabled.":"Permission not granted.")};
+document.getElementById("addContract").onclick=()=>{document.getElementById("modal").classList.add("show");document.getElementById("cName").focus()};
+document.getElementById("cancelModal").onclick=()=>document.getElementById("modal").classList.remove("show");
+document.getElementById("saveContract").onclick=()=>{let n=document.getElementById("cName").value.trim();if(!n)return;state.contracts.push({id:Date.now(),name:n,freq:document.getElementById("cFreq").value,type:document.getElementById("cType").value,target:Number(document.getElementById("cTarget").value)||1,active:true,created:today()});save();document.getElementById("modal").classList.remove("show");document.getElementById("cName").value="";render();showToast("Contract added.")};
+document.getElementById("addMemory").onclick=()=>{let title=prompt("Memory title");if(!title)return;let text=prompt("What do you want to remember?")||"";state.vault.unshift({title,text,date:today()});save();render()};
+setInterval(()=>{let now=new Date();if(now.getHours()===22&&now.getMinutes()===0&&Notification.permission==="granted"&&activeDaily().some(c=>!isDone(today(),c)))new Notification("❄️ Winter Arc • 10 PM",{body:activeDaily().filter(c=>!isDone(today(),c)).length+" commitments still waiting for you."})},60000);
+setInterval(processDay,60000);processDay();render();
+</script>
+</body></html>
